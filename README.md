@@ -163,11 +163,11 @@ Then please run:
 ```
 python3 main.py --configs/Template-LBBDM-video.yaml --gpu_ids 0 --resume_model /path/to/vimeo_unet --sample_to_eval
 
-python3 batch_to_entire.py --latent --dataset dataset_name --step 50
+python3 batch_to_entire.py --latent --dataset dataset_name --step 10
 
 python3 copy_GT.py --latent --dataset dataset_name
 
-python3 eval.py --latent --dataset dataset_name --step 50
+python3 eval.py --latent --dataset dataset_name --step 10
 ```
 
 The ```main.py``` will print PSNR/SSIM in the terminal. The dataset_name is the one shown in ```configs/Template-LBBDM-video.yaml```. 
