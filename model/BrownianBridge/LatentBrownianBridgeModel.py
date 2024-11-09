@@ -147,5 +147,5 @@ class LatentBrownianBridgeModel(BrownianBridgeModel):
     #     out = self.vqgan.decode(x_latent_quant)
     #     return out
     
-    def get_flow(self, img0, img1):
-        return self.vqgan.get_flow(self.img0,img1)
+    def get_flow(self, img0, img1,feats):
+        return self.vqgan.get_flow(self,img0,img1,feats)
