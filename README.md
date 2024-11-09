@@ -47,24 +47,9 @@ pip install -r requirements.txt
 
 ### Trained Model
 
-The weights of of our trained model can be downloaded <a href="https://drive.google.com/file/d/1Z5kPMdYiC4CSvl1mrQLz9MqtJx7RjvrK/view?usp=sharing">here</a>. This is named as ```vimeo_unet.pth```.
+The weights of of our trained model can be downloaded <a href="https://drive.google.com/file/d/1XVEEsyM-GmQIQ0q-e00CG4YTZAOrY36u/view?usp=sharing">here</a>. This is named as ```vimeo_unet.pth```.
 
-The VQ Model (the autoencoder part of the above model) is available <a href="https://drive.google.com/file/d/1V8WS7bZe_RTCtyYZ6ZFkur8sHbKvVkT8/view?usp=sharing"> here</a>. This is named as ```vimeo_new.ckpt```.
-
-
-## Inference
-**Please comment line 6 in ```utils.py``` before we provide training codes!**
-
-**Please leave the *model.VQGAN.params.dd_config.load_VFI* and *model.VQGAN.params.ckpt_path* in ```configs/Template-LBBDM-video.yaml``` as empty**, otherwise you need to download the model weights of VFIformer from <a href="https://drive.google.com/drive/folders/140bDl6LXPMlCqG8DZFAXB3IBCvZ7eWyv"> here</a> and our VQ Model. You need to change the path of *load_VFI* and *ckpt_path* to the path of downloaded VFIformer and our VQGAN respectively.
-
-Please download our trained model.
-
-Then run:
-
-```
-python interpolate.py --resume_model path_to_model_weights --frame0 path_to_the_previous_frame --frame1 path_to_the_next_frame
-```
-This will interpolate 7 frames in between, you may modify the code to interpolate different number of frames with a bisection like methods
+The VQ Model (the autoencoder part of the above model) is available <a href="https://drive.google.com/file/d/1qxM7Ek46iHN7wrw-TYkuwf3ptc0JxnFn/view?usp=sharing"> here</a>. This is named as ```vimeo_new.ckpt```.
 
 
 ## Prepare datasets
@@ -114,41 +99,6 @@ Data should be in the following structure:
 
 You can either rename folders to our structures, or change the the codes.
 
-## Training and Evaluating
-
-
-**If you comment line 6 in ```utils.py```, please uncomment it!**
-
-
-Please edit the configs file in ```configs/Template-LBBDM-video.yaml```! 
-
-Change data.dataset_config.dataset_path to your path to dataset (the path until ```<data directory>``` above)
-
-Change model.VQGAN.params.dd_config.load_VFI to your downloaded VFIformer weights
-
-### Train your autoencoder
-
-Please refer to [LDMVFI](https://github.com/danier97/LDMVFI) for training. To train the autoencoder, you need to replace some codes in LDMVFI with our versions:
-
-1. We provide our config file in ```autoenc/vqflow-f32.yaml```, please replace the ```configs/autoencoder/vqflow-f32.yaml``` in LDMVFI with this file.
-
-2. Please also replace ```ldm/data/bvi_vimeo.py``` in LDMVFI with our provided ```autoenc/bvi_vimeo.py```. We only includes Vimeo90K triplets for training.
-
-3. Please replace the class FlowDecoderWithResidual (line 354) in ```ldm/modules/diffusionmodules/model.py``` in LDMVFI with our Decoder in ```model/BrownianBridge/base/modules/diffusionmodules/model.py```(line 968)
-
-After training, you should move the saved VQModel as ```results/VQGAN/vimeo_new.ckpt```. You are also free to change model.VQGAN.params.ckpt_path in ```configs/Template-LBBDM-video.yaml``` to fit your path of ckpt.
-
-### Train the UNet
-
-Make sure that model.VQGAN.params.ckpt_path in ```configs/Template-LBBDM-video.yaml``` is set correctly.
-
-Please run:
-
-```
-python3 main.py --config configs/Template-LBBDM-video.yaml --train --save_top --gpu_ids 0
-```
-
-You may use ```--resume_model /path/to/ckpt``` to resume training. The model will be saved in ```results/dataset_name in configs file/model_name in configs file```. For simplicity, you can leave *dataset_name* and *model_name* unchanged as UCF and LBBDM-f32 during training.
 
 ### Evaluate
 
@@ -163,11 +113,11 @@ Then please run:
 ```
 python3 main.py --configs/Template-LBBDM-video.yaml --gpu_ids 0 --resume_model /path/to/vimeo_unet --sample_to_eval
 
-python3 batch_to_entire.py --latent --dataset dataset_name --step 50
+python3 batch_to_entire.py --latent --dataset dataset_name --step 10
 
 python3 copy_GT.py --latent --dataset dataset_name
 
-python3 eval.py --latent --dataset dataset_name --step 50
+python3 eval.py --latent --dataset dataset_name --step 10
 ```
 
 The ```main.py``` will print PSNR/SSIM in the terminal. The dataset_name is the one shown in ```configs/Template-LBBDM-video.yaml```. 
