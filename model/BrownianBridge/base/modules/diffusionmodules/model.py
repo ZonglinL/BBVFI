@@ -1500,12 +1500,16 @@ class FlowDecoderWithResidual(nn.Module):
             print(f'loading VFIformer from {self.load_VFI}')
             vfi.load_state_dict(torch.load(self.load_VFI))
         self.flownet = vfi.flownet
-        #self.refinenet = vfi.refinenet
+        self.refinenet = vfi.refinenet
 
-        self.refinenet = FlowRefineNet_Multis_our(c = self.ch)
+        #self.refinenet = FlowRefineNet_Multis_our(c = self.ch)
         
         for p in self.flownet.parameters():
              p.requires_grad = False
+
+
+        for p in self.refinenet.parameters():
+            p.requires_grad = False
         
         
         # compute in_ch_mult, block_in and curr_res at lowest res
@@ -1645,17 +1649,19 @@ class FlowDecoderWithResidual(nn.Module):
 
         B, _, H, W = frame_prev.size()
         imgs = torch.cat((frame_prev, frame_next), 1)
-        
+        phi_list = phi_list[1:]
         if flow is not None:
-            _, c0, c1 = self.refinenet.get_context(phi_list[:-2], flow) ## flow and warped features of refined flows, 1, 1/2,1/4,1/8
+            #_, c0, c1 = self.refinenet.get_context(phi_list[:-2], flow) ## flow and warped features of refined flows, 1, 1/2,1/4,1/8
+            c0,c1 =  self.refinenet.warp_batch_fea(phi_list, flow,B)
         else:
             flow, flow_list = self.flownet(imgs)
-            flow, c0, c1 = self.refinenet(phi_list[:-2], flow)
+            flow, c0, c1 = self.refinenet(frame_prev, frame_next, flow)
+            c0, c1 =  self.refinenet.warp_batch_fea(phi_list, flow,B)
         
         ## flow : B 4 H W
 
-        phi_list = phi_list[1:] ## remove full size features
-        c0, c1 = c0[1:], c1[1:] ## remove full size features
+        #phi_list = phi_list[1:] ## remove full size features
+        #c0, c1 = c0[1:], c1[1:] ## remove full size features
         #c0,c1 =  self.refinenet.warp_batch_fea(phi_list, flow,B)
         warped_img0 = warp(frame_prev, flow[:, :2])
         warped_img1 = warp(frame_next, flow[:, 2:])
@@ -1736,10 +1742,10 @@ class FlowDecoderWithResidual(nn.Module):
         else:
             return out
 
-    def get_flow(self, img0, img1,feats):
+    def get_flow(self, img0, img1):
         imgs = torch.cat((img0, img1), 1)
         flow, flow_list = self.flownet(imgs)
-        flow, c0, c1 = self.refinenet(feats, flow)
+        flow, c0, c1 = self.refinenet(img0,img1, flow)
 
         return flow
     
