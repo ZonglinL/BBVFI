@@ -310,14 +310,16 @@ class FlowRefineNet_Multis(nn.Module):
         return outs
 
     def warp_batch_fea(self, feas, flow,bs):
-        outs = []
+        c0 = []
+        c1 = []
         for i, fea in enumerate(feas):
             flow = F.interpolate(flow, scale_factor=0.5, mode="bilinear", align_corners=False) * 0.5
             out0 = warp(fea[:bs], flow[:,:2])
             out1 = warp(fea[bs:], flow[:,2:])
-            outs.append(out)
+            c0.append(out0)
+            c1.append(out1)
             
-        return outs
+        return c0,c1
 
 
 
