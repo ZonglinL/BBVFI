@@ -107,7 +107,7 @@ class UCF(Dataset):
         self._length = len(self.image_dirs) ## folder of the images
         self.to_normal = to_normal # # if normalize to [-1, 1] nor not
         self.flip = flip ## if flip or not
-        self.img_dirs.sort()
+        self.image_dirs.sort()
 
     def __len__(self):
 
@@ -215,7 +215,7 @@ class DAVIS(Dataset):
         self._length = len(self.image_dirs) ## folder of the images
         self.to_normal = to_normal# if normalize to [-1, 1] nor not
         self.flip = flip ## if flip or not
-        self.img_dirs.sort()
+        self.image_dirs.sort()
 
     def __len__(self):
 
@@ -268,7 +268,7 @@ class FILM(Dataset):
         self._length = len(self.image_dirs) ## folder of the images
         self.to_normal = to_normal # if normalize to [-1, 1] nor not
         self.flip = flip ## if flip or not
-        self.img_dirs.sort()
+        self.image_dirs.sort()
 
     def __len__(self):
 
