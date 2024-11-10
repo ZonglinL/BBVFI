@@ -417,8 +417,7 @@ class VQFlowNetInterface(VQFlowNet):
         # 8: window size for max vit
         # 2**(nr-1): f 
         # 4: factor of downsampling in DDPM unet
-        #min_side = 8 * 2**(self.encoder.num_resolutions-1) * 4
-        min_side = 256
+        min_side = 8 * 2**(self.encoder.num_resolutions-1) * 4
         if self.h0 % min_side != 0:
             pad_h = min_side - (self.h0 % min_side)
             if pad_h == self.h0: # this is to avoid padding 256 patches
