@@ -397,9 +397,9 @@ class VQFlowNet(pl.LightningModule):
         x = 2.*(x-x.min())/(x.max()-x.min()) - 1.
         return x
 
-    def get_flow(self, img0, img1,feats):
+    def get_flow(self, img0, img1):
 
-        return self.decoder.get_flow(img0,img1,feats)
+        return self.decoder.get_flow(img0,img1)
     
 class VQFlowNetInterface(VQFlowNet):
     def __init__(self, **kwargs):
@@ -462,10 +462,8 @@ class VQFlowNetInterface(VQFlowNet):
 
                 img0_down = F.interpolate(F.pad(x_prev, (0, self.pad_w, 0, self.pad_h), mode='reflect'), scale_factor=0.5, mode="bilinear", align_corners=False)
                 img1_down = F.interpolate(F.pad(x_next, (0, self.pad_w, 0, self.pad_h), mode='reflect'), scale_factor=0.5, mode="bilinear", align_corners=False)
-
-                _,tmp_list = self.encoder(torch.cat([img0_down,torch.zeros_like(img0_down),img1_down]))
                 
-                flow_down = self.get_flow(img0_down, img1_down,tmp_list[:-2])
+                flow_down = self.get_flow(img0_down, img1_down)
                 
                 flow = F.interpolate(flow_down, scale_factor=1/0.5, mode="bilinear", align_corners=False) * 1/0.5
         else:
